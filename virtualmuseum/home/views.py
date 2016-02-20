@@ -15,3 +15,11 @@ def index():
     """
     
     return render_template('home/index.html')
+    
+@home_blueprint.route('/view')
+def view():
+    """
+    View images.
+    """
+    
+    return render_template('home/view.html')

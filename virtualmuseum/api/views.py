@@ -5,13 +5,31 @@
 # Flask Imports
 from flask import Blueprint
 from flask import jsonify
+# Application Imports
+from virtualmuseum import app
+# Imports
+import requests
 
 api_blueprint = Blueprint('api', __name__)
 
-@api_blueprint.route('/')
-def index():
+@api_blueprint.route('/paintings')
+@api_blueprint.route('/paintings/<int:page_number>')
+def index(page_number=1):
     """
     API Index.
     """
-    json_loaded_from_api = "{u'http://collection.britishmuseum.org/id/object/1634306': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00150/AN00150064_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/698802': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00198/AN00198523_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/P_1868-0808-5417': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00150/AN00150064_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/777960': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223721_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223721_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/777961': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223722_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223722_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/J_1985-1223-0-4': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223721_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223721_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/777963': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223720_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223720_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/J_1985-1223-0-2': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223719_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223719_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/777962': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223719_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223719_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/PPA259545': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00767/AN00767197_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/J_1985-1223-0-1': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223720_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223720_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/P_1967-1219-9': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00198/AN00198523_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/3249086': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00767/AN00767197_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/P_1857-1222-102': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00767/AN00767197_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/J_1985-1223-0-3': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223722_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223722_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/P_1998-1004-18': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00084/AN00084649_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00084/AN00084649_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/703807': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00084/AN00084649_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00084/AN00084649_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/PPA8041': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00198/AN00198523_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/PPA142880': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00150/AN00150064_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/PPA2943': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00084/AN00084649_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00084/AN00084649_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/JCF12745': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223722_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223722_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/JCF12744': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223719_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223719_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/JCF12746': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223721_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223721_001_l.jpg']}, u'http://collection.britishmuseum.org/id/object/JCF12743': {'images': [u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223720_001_l.jpg', u'http://www.britishmuseum.org/collectionimages/AN00223/AN00223720_001_l.jpg']}}"
-    return jsonify(data=json_loaded_from_api)
+    
+    # http://www.vam.ac.uk/api/json/museumobject
+    #search?objectnamesearch=painting
+    endpoint = app.config['MUSEUM_API_ENDPOINT']
+    # Calculate the offset. page 1 should have offset = 0, page 2 offset = 10 etc...
+    offset = (page_number - 1) * 10
+    url = endpoint+'search?objectnamesearch=painting&limit=10&offset=%d' %(offset)
+    # Get the data from the api. 
+    response = requests.get(url).json()
+    # Add the IMAGE URIs to the response.
+    for record in response["records"]:
+        # Add a new field for the image_uri.
+        record["fields"]["image_uri"] = app.config['MUSEUM_IMAGE_ENDPOINT']+record["fields"]["primary_image_id"][:6]+'/'+record["fields"]["primary_image_id"]+'.jpg'
+
+    return jsonify(response)

@@ -1,0 +1,54 @@
+{% extends '_layout.html' %}
+{% block content %}
+    <style type="text/css" media="all">
+    .image {
+        display: block;
+        overflow: hidden;
+        background-size: cover;
+        background-position: center top;
+        background-repeat: no-repeat;
+        width: 33%;
+        height: 200px;
+        float: left;
+    }
+    #load_more {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+    }
+    </style>
+    <div id="gallery">
+    </div>
+    <a href="#" role="button" class="btn btn-primary" id="load_more">Load more</a>
+{% endblock %}
+{% block script %}
+    <script>
+        // Variable to keep track of the next page.
+        var next_page = 2;
+        // HTML Load Function
+        function load_images(page_number){
+            $.ajax({
+                url: "/api/v1.0/paintings/"+ page_number,
+                type: "GET",
+        
+                contentType: 'application/json; charset=utf-8',
+                success: function(resultData) {
+                    data = resultData.records
+                    for(var i=0;i<data.length;i++){
+                        html = '<a href="'+data[i].fields.image_uri+'" class="image" style="background-image: url('+data[i].fields.image_uri+');"></a>'
+                        $("#gallery").append(html);
+                    }
+                },
+                error : function(jqXHR, textStatus, errorThrown) {
+                },
+        
+                timeout: 600,
+            });
+        }
+        $('#load_more').click(function(event) {
+            load_images(next_page);
+            next_page ++;
+        });
+        load_images(1);
+    </script>
+{% endblock %}

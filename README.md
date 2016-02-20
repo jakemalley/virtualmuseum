@@ -1,4 +1,4 @@
 Virtual Museum
 ==============
 
-Virtual tour of The British Museum.
+Virtual tour of Victoria and Albert Museum.
