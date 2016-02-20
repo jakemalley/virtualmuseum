@@ -21,6 +21,8 @@ except Exception as e:
 
 # Import Blueprints
 from virtualmuseum.home.views import home_blueprint
+from virtualmuseum.api.views import api_blueprint
 
 # Register Blueprints
 app.register_blueprint(home_blueprint)
+app.register_blueprint(api_blueprint, url_prefix='/api/v1.0')
