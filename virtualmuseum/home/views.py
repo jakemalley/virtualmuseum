@@ -5,6 +5,7 @@
 # Flask Imports
 from flask import Blueprint
 from flask import render_template
+from flask import request
 
 home_blueprint = Blueprint('home', __name__)
 
@@ -13,8 +14,14 @@ def index():
     """
     Application index.
     """
+    # Search variable.
+    search = None
     
-    return render_template('home/index.html')
+    # Get http type args.
+    if request.args.get("search"):
+        search = request.args.get("search")
+    
+    return render_template('home/index.html', search=search)
     
 @home_blueprint.route('/view')
 def view():

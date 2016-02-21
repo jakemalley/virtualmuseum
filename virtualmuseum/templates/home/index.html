@@ -1,251 +1,83 @@
 {% extends '_layout.html' %}
+{% block style %}
+<!-- Styles -->
+<link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet">
+{% endblock %}
 {% block content %}
-    <div id="blocker">
-        <div id="instructions">
-            START
+    <div id="landing">
+        <div class=".container">
+            <div class="box">
+                <img class="logo" src='/static/va.png'>
+                <h2>Victoria & Albert Museum Tour</h2>
+                <hr>
+                <h2>The World's Leading Museum of Art and Design</h2>
+                <form method="GET" action="">
+                <div class="row">
+                    <div class="col-md-4 col-md-offset-4">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control search" placeholder="{% if search %}{{search}}{%else%}Search for...{% endif %}">
+                            <span class="input-group-btn">
+                                <input class="btn btn-default" type="submit" value="Go">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                </form>
+                <button id="im_feeling_lucky" class="btn btn-default" type="button">{% if search %}Look for "{{search}}" in the museum{%else%}I'm feeling lucky{% endif %}</button>
+            </div>
         </div>
     </div>
+    <div id="blocker">
+        <div id="instructions">
+            <div class=".container">
+                <img class="logo" src='/static/va.png'>
+                <h2>Victoria & Albert Museum Tour</h2>
+                <hr>
+                <h2>The World's Leading Museum of Art and Design</h2>
+                <button id="continue_button" class="btn btn-default" type="button">Continue looking around</button>
+                <a role="button" href="{{url_for('home.index')}}" class="btn btn-default">Take me home</a>
+            </div>
+        </div>
+    </div>
+    <div id="information"></div>
 {% endblock %}
 {% block script %}
     <!-- javascript -->
     <script src="{{url_for('static', filename='js/PointerLockControls.js')}}"></script>
+    <script src="{{url_for('static', filename='js/basic_museum_scene.js')}}"></script>
     <script type="text/javascript">
-        // Define Global Variables
-        var camera;
-        var scene;
-        var controls;
-        var renderer;
-        var raycaster;
-        var geometry, material, mesh;
-        var controlsEnabled = false;
-        var moveForward, moveBackward, moveLeft, moveRight;
-        var prevTime = performance.now();
-        var velocity = new THREE.Vector3();
+        var cube_start_position = -40;
         
-        // Get the blocker and instructions elements.
-        var blocker = document.getElementById('blocker');
-        var instructions = document.getElementById('instructions');
+        function load_images(){
+            $.ajax({
+                url: {% if search %}"/api/v1.0/museum/search/{{search}}"{% else %}"/api/v1.0/museum"{% endif %},
+                type: "GET",
         
-        // Check to see if pointer lock is enabled.
-        var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
-        if (havePointerLock){
-            // Get the document body.
-            var element = document.body;
-            
-            // Pointer Lock Exchange.
-            var pointerLockExchange = function (event) {
-                if (document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element) {
-                    controlsEnabled = true;
-                    controls.enabled = true;
-                    blocker.style.display = 'none';
-                } else {
-                    controlsEnabled = false;
-                    controls.enabled = false;
-                    blocker.style.display = '-webkit-box';
-					blocker.style.display = '-moz-box';
-					blocker.style.display = 'box';
-
-					instructions.style.display = '';
-                }
-            };
-            // Point Lock Error.
-            var pointerLockError = function (event) {
-                console.log('Pointer Lock Error');
-            };
-            
-            // Add pointer listeners.
-            document.addEventListener( 'pointerlockchange', pointerLockExchange, false );
-			document.addEventListener( 'mozpointerlockchange', pointerLockExchange, false );
-			document.addEventListener( 'webkitpointerlockchange', pointerLockExchange, false );
-
-			document.addEventListener( 'pointerlockerror', pointerLockError, false );
-			document.addEventListener( 'mozpointerlockerror', pointerLockError, false );
-			document.addEventListener( 'webkitpointerlockerror', pointerLockError, false );
-			
-			// Add click listener for the instructions.
-			instructions.addEventListener('click', function (event) {
-			
-			    // When clicked set display to none.
-			    instructions.style.display = 'none';
-			    // Lock the pointer.
-			    element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-			    
-			    if (/Firefox/i.test( navigator.userAgent )) {
-    				var fullscreenchange = function (event) {
-    					if (document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-    						document.removeEventListener( 'fullscreenchange', fullscreenchange );
-    						document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-    						element.requestPointerLock();
-    					}
-    				};
-    
-    				document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-    				document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
-    				element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-    				element.requestFullscreen();
-    			} else {
-    				element.requestPointerLock();
-    			}
-			    
-			}, false);
-			
-        } else {
-            instructions.innerHTML = 'I can\'t run? Your browser doesn\'t seem to support pointer lock? :(';
+                contentType: 'application/json; charset=utf-8',
+                success: function(resultData) {
+                    data = resultData.records
+                    start = 1;
+                    for(var i=0;i<data.length;i+=2){
+                        x_pos = 40 * start + (Math.floor(Math.random()*31) - 10);
+                        start = start*-1;
+                        z_pos = (i * -10) + cube_start_position
+                        // Add the stand.
+                        addStand(
+                            [
+                            data[i].fields,
+                            data[i+1].fields,
+                            ], x_pos, 0, z_pos
+                        );
+                    }
+                    cube_start_position = (i * -20) + cube_start_position;
+                },
+                error : function(jqXHR, textStatus, errorThrown) {
+                },
+                timeout: 600,
+            });
         }
-        
-        
-        // Init Function.
-        function init() {
-            // Create a new Camera Object.
-            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000 );
-            camera.position.set(1,1,1);
-            // Create a new Scene Object.
-            scene = new THREE.Scene();
-            // Create a new Ambiernt
-            var light = new THREE.AmbientLight(0x404040); // soft white light
-            scene.add(light);
-            // Create the controls object.
-            controls = new THREE.PointerLockControls(camera);
-            scene.add(controls.getObject());
-            // document event listeners for keydown and keyup
-            document.addEventListener('keydown', onKeyDown, false);
-            document.addEventListener('keyup', onKeyUp, false);
-            // Key Down Function.
-            var onKeyDown = function (event) {
-                switch (event.keyCode) {
-                // if up or w
-                case 38:
-                case 87:
-                    // move forward
-                    moveForward = true;
-                    break;
-                // if left or a
-                case 37:
-                case 65:
-                    // move left
-                    moveLeft = true;
-                    break;
-                // if down or s
-                case 40:
-                case 83:
-                    // move backwards
-                    moveBackward = true;
-                    break;
-                // if right or d
-                case 39:
-                case 68:
-                    // move right
-                    moveRight = true;
-                    break;
-                }    
-            };
-            // Key Up Function.
-            var onKeyUp = function (event) {
-                switch (event.keyCode) {
-                // if up or w
-                case 38:
-                case 87:
-                    // stop moving forward
-                    moveForward = false;
-                    break;
-                // if left or a
-                case 37:
-                case 65:
-                    // stop moving left
-                    moveLeft = false;
-                    break;
-                // if down or s
-                case 40:
-                case 83:
-                    // stop moving backwards
-                    moveBackward = false;
-                    break;
-                // if right or d
-                case 39:
-                case 68:
-                    // stop moving right
-                    moveRight = false;
-                    break;
-                }
-            };
-            
-            var onWindowResize = function () {
-                // Reset camera aspect ratio.
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                // Reset renderer size.
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            };
-            
-            // Add event listeners for keyup and keydown.
-            document.addEventListener('keydown', onKeyDown, false);
-            document.addEventListener('keyup', onKeyUp, false);
-            
-            // Create raycaster.
-            raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10)
-            
-            // Create Floor.
-            geometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
-			geometry.rotateX( - Math.PI / 2 );
-			material = new THREE.MeshBasicMaterial( { color: 0xbdbdbd} );
-			floor = new THREE.Mesh( geometry, material ); 
-			scene.add(floor);
-			
-			// Create renderer.
-			renderer = new THREE.WebGLRenderer();
-			renderer.setClearColor( 0xffffff );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
-			
-			// Add resize listener.
-			window.addEventListener( 'resize', onWindowResize, false );
-        }
-        function reference(){
-            var geometry = new THREE.BoxGeometry( 10, 10, 10 );
-			var material = new THREE.MeshBasicMaterial( { color: 0x0000f} );
-			var cube = new THREE.Mesh( geometry, material );
-            cube.position.set(0,10,-40);
-			scene.add(cube);
-			
-        }
-        function render(){
-            requestAnimationFrame( render );
-            if (controlsEnabled) {
-                raycaster.ray.origin.copy(controls.getObject().position);
-                raycaster.ray.origin.y -= 10;
-                
-                var time = performance.now();
-                var delta = (time - prevTime) / 1000;
-                
-                velocity.x -= velocity.x * 10.0 * delta;
-                velocity.z -= velocity.z * 10.0 * delta;
-                
-                velocity.y -= 9.81 * 100.0 * delta;
-                
-                if (moveForward) velocity.z -= 400.0 * delta;
-                if (moveBackward) velocity.z += 400.0 * delta;
-                
-                if (moveLeft) velocity.x -= 400.0 * delta;
-                if (moveRight) velocity.x += 400.0 * delta;
-                
-                controls.getObject().translateX(velocity.x * delta);
-                controls.getObject().translateY(velocity.y * delta);
-                controls.getObject().translateZ(velocity.z * delta);
-                
-                if ( controls.getObject().position.y < 10 ) {
-
-					velocity.y = 0;
-					controls.getObject().position.y = 10;
-
-				}
-                prevTime = time;
-            }
-            renderer.render(scene, camera);
-        }
-        
         init();
-        reference();
+        load_images();
         render();
     </script>
 {% endblock %}

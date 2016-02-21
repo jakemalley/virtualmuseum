@@ -1,6 +1,10 @@
 {% extends '_layout.html' %}
 {% block content %}
     <style type="text/css" media="all">
+    @import url(https://fonts.googleapis.com/css?family=Indie+Flower);
+    body {
+        font-family: 'Indie Flower', cursive;
+    }
     .image {
         display: block;
         overflow: hidden;
@@ -19,7 +23,7 @@
     </style>
     <div id="gallery">
     </div>
-    <a href="#" role="button" class="btn btn-primary" id="load_more">Load more</a>
+    <button type="button" class="btn btn-primary" id="load_more">Load more</button>
 {% endblock %}
 {% block script %}
     <script>
@@ -28,7 +32,7 @@
         // HTML Load Function
         function load_images(page_number){
             $.ajax({
-                url: "/api/v1.0/paintings/"+ page_number,
+                url: "/api/v1.0/museum/"+ page_number,
                 type: "GET",
         
                 contentType: 'application/json; charset=utf-8',
