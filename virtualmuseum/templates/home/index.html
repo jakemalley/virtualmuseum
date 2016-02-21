@@ -24,6 +24,10 @@
                 </div>
                 </form>
                 <button id="im_feeling_lucky" class="btn btn-default" type="button">{% if search %}Look for "{{search}}" in the museum{%else%}I'm feeling lucky{% endif %}</button>
+                
+                <div id="error" class="alert alert-danger" style="display:none;margin:20px;" role="alert">
+                    <p><strong>API Error</strong> could not get data from the API. Please refresh the page.</p>
+                <div>
             </div>
         </div>
     </div>
@@ -55,8 +59,12 @@
         
                 contentType: 'application/json; charset=utf-8',
                 success: function(resultData) {
+                    document.getElementById('error').style.display = "none";
+                    document.getElementById('im_feeling_lucky').style.display = "inline-block";
                     data = resultData.records
                     start = 1;
+                    // Call the Init Function.
+                    init();
                     for(var i=0;i<data.length;i+=2){
                         x_pos = 40 * start + (Math.floor(Math.random()*31) - 10);
                         start = start*-1;
@@ -70,14 +78,16 @@
                         );
                     }
                     cube_start_position = (i * -20) + cube_start_position;
+                    // Render the page.
+                    render();
                 },
                 error : function(jqXHR, textStatus, errorThrown) {
+                    document.getElementById('error').style.display = "block";
+                    document.getElementById('im_feeling_lucky').style.display = "none";
                 },
                 timeout: 600,
             });
         }
-        init();
         load_images();
-        render();
     </script>
 {% endblock %}
