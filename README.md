@@ -7,7 +7,7 @@ Virtual tour of Victoria and Albert Museum the world's leading museum of art and
 The Idea
 ========
 This project was an entry to the hack.summit() 2016 hackathon, we decided to address the "data visualizations" theme. We were both very keen to
-explore how we could create a virtual tour of unseen museum artefacts. After researching, we found that the Victorial and Albert Museum in London provided a great
+explore how we could create a virtual tour of unseen museum artefacts. After researching, we found that the Victoria and Albert Museum in London provided a great
 api for us to collect images and information about vault stored artefacts.
 
 In essence, our web application allows you to search artefacts stored in the museum and view the images and details about each artefact in ThreeJS.
@@ -40,9 +40,7 @@ Developers
  - jakemalley <jja.malley@gmail.com> 
  - gabrieldb <gabrielbarnes@outlook.com>
 
-We are both two A-Level students from Somerset in the United Kingdom. Age 18, 17 respectively.
-For the project Jake developed the Python code for interfacing to the API and the javascript code for Three JS.
-Gabriel researched the idea, designed the 3d models and collaborated on developing the javascript code.
+We are both two A-Level students from Somerset in the United Kingdom. Age 18, 17 respectivly.
 
 Sources
 =======
