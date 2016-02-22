@@ -19,7 +19,7 @@ var continue_button = document.getElementById('continue_button');
 var landing = document.getElementById('landing')
 var information = document.getElementById('information')
 
-function test(){
+
 // Check to see if pointer lock is enabled.
 var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 if (havePointerLock){
@@ -95,9 +95,6 @@ if (havePointerLock){
 } else {
     instructions.innerHTML = 'I can\'t run? Your browser doesn\'t seem to support pointer lock? :(';
 }
-}
-test();
-
 
 // Init Function.
 function init() {
@@ -274,7 +271,6 @@ function checkIntersects() {
     } else {
         information.style.display = 'block';
         for ( var i = 0; i < intersects.length; i++ ) {
-            
             if (intersects[ i ].object.userData.title.length <= 0){
                 intersects[ i ].object.userData.title = "This artefact doesn't have a title.";
             }
@@ -315,10 +311,8 @@ function render(){
         controls.getObject().translateZ(velocity.z * delta);
         
         if ( controls.getObject().position.y < 10 ) {
-
 			velocity.y = 0;
 			controls.getObject().position.y = 10;
-
 		}
         prevTime = time;
     }

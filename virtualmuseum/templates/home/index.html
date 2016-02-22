@@ -12,22 +12,20 @@
                 <hr>
                 <h2>The World's Leading Museum of Art and Design</h2>
                 <form method="GET" action="">
-                <div class="row">
-                    <div class="col-md-4 col-md-offset-4">
-                        <div class="input-group">
-                            <input type="text" name="search" class="form-control search" placeholder="{% if search %}{{search}}{%else%}Search for...{% endif %}">
-                            <span class="input-group-btn">
-                                <input class="btn btn-default" type="submit" value="Go">
-                            </span>
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-4">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control search" placeholder="{% if search %}{{search}}{%else%}Search for...{% endif %}">
+                                <span class="input-group-btn">
+                                    <input class="btn btn-default" type="submit" value="Go">
+                                </span>
+                            </div>
+                            
+                            <p id="error" style="display:none;margin-top:20px;">API Error: could not get data from the API. Please refresh the page.</p>
                         </div>
                     </div>
-                </div>
                 </form>
                 <button id="im_feeling_lucky" class="btn btn-default" type="button">{% if search %}Look for "{{search}}" in the museum{%else%}I'm feeling lucky{% endif %}</button>
-                
-                <div id="error" class="alert alert-danger" style="display:none;margin:20px;" role="alert">
-                    <p><strong>API Error</strong> could not get data from the API. Please refresh the page.</p>
-                <div>
             </div>
         </div>
     </div>
@@ -52,42 +50,36 @@
     <script type="text/javascript">
         var cube_start_position = -40;
         
-        function load_images(){
-            $.ajax({
-                url: {% if search %}"/api/v1.0/museum/search/{{search}}"{% else %}"/api/v1.0/museum"{% endif %},
-                type: "GET",
+        // Call the Init Function.
+        init();
         
-                contentType: 'application/json; charset=utf-8',
-                success: function(resultData) {
-                    document.getElementById('error').style.display = "none";
-                    document.getElementById('im_feeling_lucky').style.display = "inline-block";
-                    data = resultData.records
-                    start = 1;
-                    // Call the Init Function.
-                    init();
-                    for(var i=0;i<data.length;i+=2){
-                        x_pos = 40 * start + (Math.floor(Math.random()*31) - 10);
-                        start = start*-1;
-                        z_pos = (i * -10) + cube_start_position
-                        // Add the stand.
-                        addStand(
-                            [
-                            data[i].fields,
-                            data[i+1].fields,
-                            ], x_pos, 0, z_pos
-                        );
-                    }
-                    cube_start_position = (i * -20) + cube_start_position;
-                    // Render the page.
-                    render();
-                },
-                error : function(jqXHR, textStatus, errorThrown) {
-                    document.getElementById('error').style.display = "block";
-                    document.getElementById('im_feeling_lucky').style.display = "none";
-                },
-                timeout: 600,
-            });
-        }
-        load_images();
+        $.get({% if search %}"/api/v1.0/museum/search/{{search}}"{% else %}"/api/v1.0/museum"{% endif %}).done(function(resultData) {
+            document.getElementById('error').style.display = "none";
+            document.getElementById('im_feeling_lucky').style.display = "inline-block";
+            data = resultData.records
+            start = 1;
+            
+            for(var i=0;i<data.length;i+=2){
+                x_pos = 40 * start + (Math.floor(Math.random()*31) - 10);
+                start = start*-1;
+                z_pos = (i * -10) + cube_start_position
+                // Add the stand.
+                addStand(
+                    [
+                    data[i].fields,
+                    data[i+1].fields,
+                    ], x_pos, 0, z_pos
+                );
+            }
+            cube_start_position = (i * -20) + cube_start_position;
+        
+        }).fail(function (resultData){
+            console.log("API Error");
+            document.getElementById('error').style.display = "block";
+            document.getElementById('im_feeling_lucky').style.display = "none";
+        });
+        
+        // Render the page.
+        render();
     </script>
 {% endblock %}
