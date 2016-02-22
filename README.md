@@ -40,9 +40,9 @@ Developers
  - jakemalley <jja.malley@gmail.com> 
  - gabrieldb <gabrielbarnes@outlook.com>
 
-We are both two A-Level students from Somerset in the United Kingdom. Age 18, 17 respectivly.
+We are both two A-Level students from Somerset in the United Kingdom. Age 18, 17 respectively.
 For the project Jake developed the Python code for interfacing to the API and the javascript code for Three JS.
-Gabriel researched the idea, designed the 3d models and colaborated on developing the javascript code.
+Gabriel researched the idea, designed the 3d models and collaborated on developing the javascript code.
 
 Sources
 =======
